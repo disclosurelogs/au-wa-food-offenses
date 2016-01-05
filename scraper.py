@@ -53,21 +53,31 @@ for notice in missing_notices:
         notice['date_of_offence'] = pdf.pq(
             'LTTextBoxHorizontal:in_bbox("%s, %s, %s, %s")' % (abn_x, abn_y, page_width, abn_y + 15))\
             .text().strip()
+
         page_1_table_y = float(pdf.pq('LTTextBoxHorizontal:contains("Legislation")').attr('y1'))
         legislation = pdf.pq(':in_bbox("%s, %s, %s, %s")' % (
             0 , 0,col_1_end_x+20, page_1_table_y-20))
-        notice['legislation'] = legislation.text()
+        notice['legislation'] = legislation.text().strip()
+
+        penalty = pdf.pq('LTTextBoxHorizontal:in_bbox("%s, %s, %s, %s") ' % (
+            col_2_end_x , 50, page_width, page_1_table_y))
+        notice['penalty'] = penalty.text().strip()
 
         notice['offence_details'] = ' '
         offence_details = pdf.pq('LTPage[page_index="0"] :in_bbox("%s, %s, %s, %s")' % (
             col_1_end_x, 0, col_2_end_x, page_1_table_y))
-        notice['offence_details'] += offence_details.text()
+        notice['offence_details'] += offence_details.text().strip()
 
         offence_details2 = pdf.pq('LTPage[page_index="1"] :in_bbox("%s, %s, %s, %s")' % (
             col_1_end_x, 0, col_2_end_x, page_height))
-        notice['offence_details'] += ' '+ offence_details2.text()
+        notice['offence_details'] += ' '+ offence_details2.text().strip()
 
-        penalty = pdf.pq('LTTextBoxHorizontal:in_bbox("%s, %s, %s, %s") ' % (
-            col_2_end_x , 50, page_width, page_1_table_y))
-        notice['penalty'] = penalty.text()
+        #if all else fails, try try again
+        if notice['offence_details'].strip() == '':
+            text = pdf.pq('LTTextBoxHorizontal').text().strip()
+            result = re.findall("(Non-compliance.*)( 1 *?)",text)
+            if result[0]:
+                notice['offence_details'] = result[0][0].strip()
+
+
         scraperwiki.sql.save(unique_keys=["notice_pdf_url"], data=notice)
