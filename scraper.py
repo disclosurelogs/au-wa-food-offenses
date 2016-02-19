@@ -54,7 +54,7 @@ for notice in missing_notices:
             'LTTextBoxHorizontal:in_bbox("%s, %s, %s, %s")' % (abn_x, abn_y, page_width, abn_y + 15))\
             .text().strip()
 
-        page_1_table_y = float(pdf.pq('LTTextBoxHorizontal:contains("Legislation")').attr('y1'))
+        page_1_table_y = float(pdf.pq('LTTextBoxHorizontal:contains("egislation")').attr('y1'))
         legislation = pdf.pq(':in_bbox("%s, %s, %s, %s")' % (
             0 , 0,col_1_end_x+20, page_1_table_y-20))
         notice['legislation'] = legislation.text().strip()
