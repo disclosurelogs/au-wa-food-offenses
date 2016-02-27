@@ -65,7 +65,7 @@ for notice in missing_notices:
 
         notice['offence_details'] = ' '
         offence_details = pdf.pq('LTPage[page_index="0"] :in_bbox("%s, %s, %s, %s")' % (
-            col_1_end_x, 0, col_2_end_x, page_1_table_y))
+            col_1_end_x-8, 0, col_2_end_x, page_1_table_y))
         notice['offence_details'] += offence_details.text().strip()
 
         offence_details2 = pdf.pq('LTPage[page_index="1"] :in_bbox("%s, %s, %s, %s")' % (
@@ -75,9 +75,10 @@ for notice in missing_notices:
         #if all else fails, try try again
         if notice['offence_details'].strip() == '':
             text = pdf.pq('LTTextBoxHorizontal').text().strip()
-            result = re.findall("(Non-compliance.*)( 1 *?)",text)
-            if result[0]:
-                notice['offence_details'] = result[0][0].strip()
+            noncomply = re.findall("(Non-compliance.*)( 1 *?)",text)
+            if noncomply and noncomply[0]:
+                notice['offence_details'] = noncomply[0][0].strip()
+
 
 
         scraperwiki.sql.save(unique_keys=["notice_pdf_url"], data=notice)
