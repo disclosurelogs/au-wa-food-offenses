@@ -17,10 +17,10 @@ pdf_size = re.compile("\(PDF.*")
 for tr in soup.tbody.find_all('tr'):
     notice = {}
     notice['date_of_conviction'] = tr.find_all('td')[0].text
-    notice['business_name'] = pdf_size.sub("",tr.find_all('td')[0].a.text).strip()
-    notice['notice_pdf_url'] = base_url + tr.find_all('td')[0].a.get('href').replace(' ', '%20')
-    notice['business_location'] = tr.find_all('td')[0].text.strip().split("\n")[1].strip()
-    notice['convicted_persons'] = tr.find_all('td')[1].text.strip()
+    notice['business_name'] = pdf_size.sub("",tr.find_all('td')[1].a.text).strip()
+    notice['notice_pdf_url'] = base_url + tr.find_all('td')[1].a.get('href').replace(' ', '%20')
+    notice['business_location'] = tr.find_all('td')[1].text.strip().split("\n")[1].strip()
+    notice['convicted_persons'] = tr.find_all('td')[2].text.strip()
     notice['enforcement_agency'] = tr.find_all('td')[2].text.strip()
     if not data_exists:
         missing_notices.append(notice)
